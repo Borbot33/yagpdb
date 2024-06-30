@@ -27,7 +27,7 @@ import (
 )
 
 func MBaseCmd(cmdData *dcmd.Data, targetID int64) (config *Config, targetUser *discordgo.User, err error) {
-	config, err = GetConfigOrDefault(cmdData.GuildData.GS.ID)
+	config, err = GetCachedConfigOrDefault(cmdData.GuildData.GS.ID)
 	if err != nil {
 		return nil, nil, errors.WithMessage(err, "GetConfig")
 	}
@@ -169,6 +169,10 @@ var ModerationCommands = []*commands.YAGCommand{
 		DefaultEnabled:           false,
 		IsResponseEphemeral:      true,
 		RunFunc: func(parsed *dcmd.Data) (interface{}, error) {
+			if parsed.Context().Value(commands.CtxKeyExecutedByNestedCommandTemplate) == true {
+				return nil, errors.New("cannot nest exec/execAdmin calls")
+			}
+
 			config, target, err := MBaseCmd(parsed, parsed.Args[0].Int64())
 			if err != nil {
 				return nil, err
@@ -199,7 +203,7 @@ var ModerationCommands = []*commands.YAGCommand{
 			if parsed.TraditionalTriggerData != nil {
 				msg = parsed.TraditionalTriggerData.Message
 			}
-			err = BanUserWithDuration(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, target, banDuration, ddays)
+			err = BanUserWithDuration(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, target, banDuration, ddays, parsed.Context().Value(commands.CtxKeyExecutedByCommandTemplate) == true)
 			if err != nil {
 				return nil, err
 			}
@@ -275,6 +279,10 @@ var ModerationCommands = []*commands.YAGCommand{
 		SlashCommandEnabled: true,
 		IsResponseEphemeral: true,
 		RunFunc: func(parsed *dcmd.Data) (interface{}, error) {
+			if parsed.Context().Value(commands.CtxKeyExecutedByNestedCommandTemplate) == true {
+				return nil, errors.New("cannot nest exec/execAdmin calls")
+			}
+
 			config, target, err := MBaseCmd(parsed, parsed.Args[0].Int64())
 			if err != nil {
 				return nil, err
@@ -310,7 +318,7 @@ var ModerationCommands = []*commands.YAGCommand{
 				msg = parsed.TraditionalTriggerData.Message
 			}
 
-			err = KickUser(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, target, toDel)
+			err = KickUser(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, target, toDel, parsed.Context().Value(commands.CtxKeyExecutedByCommandTemplate) == true)
 			if err != nil {
 				return nil, err
 			}
@@ -335,6 +343,10 @@ var ModerationCommands = []*commands.YAGCommand{
 		DefaultEnabled:           false,
 		IsResponseEphemeral:      true,
 		RunFunc: func(parsed *dcmd.Data) (interface{}, error) {
+			if parsed.Context().Value(commands.CtxKeyExecutedByNestedCommandTemplate) == true {
+				return nil, errors.New("cannot nest exec/execAdmin calls")
+			}
+
 			config, target, err := MBaseCmd(parsed, parsed.Args[0].Int64())
 			if err != nil {
 				return nil, err
@@ -369,7 +381,7 @@ var ModerationCommands = []*commands.YAGCommand{
 			if parsed.TraditionalTriggerData != nil {
 				msg = parsed.TraditionalTriggerData.Message
 			}
-			err = MuteUnmuteUser(config, true, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, member, int(d.Minutes()))
+			err = MuteUnmuteUser(config, true, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, member, int(d.Minutes()), parsed.Context().Value(commands.CtxKeyExecutedByCommandTemplate) == true)
 			if err != nil {
 				return nil, err
 			}
@@ -394,6 +406,10 @@ var ModerationCommands = []*commands.YAGCommand{
 		DefaultEnabled:           false,
 		IsResponseEphemeral:      true,
 		RunFunc: func(parsed *dcmd.Data) (interface{}, error) {
+			if parsed.Context().Value(commands.CtxKeyExecutedByNestedCommandTemplate) == true {
+				return nil, errors.New("cannot nest exec/execAdmin calls")
+			}
+
 			config, target, err := MBaseCmd(parsed, parsed.Args[0].Int64())
 			if err != nil {
 				return nil, err
@@ -418,7 +434,7 @@ var ModerationCommands = []*commands.YAGCommand{
 			if parsed.TraditionalTriggerData != nil {
 				msg = parsed.TraditionalTriggerData.Message
 			}
-			err = MuteUnmuteUser(config, false, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, member, 0)
+			err = MuteUnmuteUser(config, false, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, member, 0, parsed.Context().Value(commands.CtxKeyExecutedByCommandTemplate) == true)
 			if err != nil {
 				return nil, err
 			}
@@ -444,6 +460,9 @@ var ModerationCommands = []*commands.YAGCommand{
 		DefaultEnabled:           false,
 		IsResponseEphemeral:      true,
 		RunFunc: func(parsed *dcmd.Data) (interface{}, error) {
+			if parsed.Context().Value(commands.CtxKeyExecutedByNestedCommandTemplate) == true {
+				return nil, errors.New("cannot nest exec/execAdmin calls")
+			}
 			config, target, err := MBaseCmd(parsed, parsed.Args[0].Int64())
 			if err != nil {
 				return nil, err
@@ -474,7 +493,7 @@ var ModerationCommands = []*commands.YAGCommand{
 			if parsed.TraditionalTriggerData != nil {
 				msg = parsed.TraditionalTriggerData.Message
 			}
-			err = TimeoutUser(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, &member.User, d)
+			err = TimeoutUser(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, reason, &member.User, d, parsed.Context().Value(commands.CtxKeyExecutedByCommandTemplate) == true)
 			if err != nil {
 				return nil, err
 			}
@@ -627,6 +646,7 @@ var ModerationCommands = []*commands.YAGCommand{
 			{Name: "a", Help: "Only remove messages with attachments"},
 			{Name: "to", Help: "Stop at this msg ID", Type: dcmd.BigInt},
 			{Name: "from", Help: "Start at this msg ID", Type: dcmd.BigInt},
+			{Name: "bots", Help: "Remove bot messages only"},
 		},
 		RequiredDiscordPermsHelp: "ManageMessages or ManageGuild",
 		RequireBotPerms:          [][]int64{{discordgo.PermissionAdministrator}, {discordgo.PermissionManageGuild}, {discordgo.PermissionManageMessages}},
@@ -690,6 +710,10 @@ var ModerationCommands = []*commands.YAGCommand{
 
 			if onlyDeleteWithAttachments := parsed.Switches["a"].Bool(); onlyDeleteWithAttachments {
 				filters = append(filters, &MessagesWithAttachmentsFilter{})
+			}
+
+			if onlyDeleteBotMessages := parsed.Switches["bots"].Bool(); onlyDeleteBotMessages {
+				filters = append(filters, &BotMessagesFilter{})
 			}
 
 			var triggerID int64
@@ -821,6 +845,10 @@ var ModerationCommands = []*commands.YAGCommand{
 		DefaultEnabled:           false,
 		IsResponseEphemeral:      true,
 		RunFunc: func(parsed *dcmd.Data) (interface{}, error) {
+			if parsed.Context().Value(commands.CtxKeyExecutedByNestedCommandTemplate) == true {
+				return nil, errors.New("cannot nest exec/execAdmin calls")
+			}
+
 			config, target, err := MBaseCmd(parsed, parsed.Args[0].Int64())
 			if err != nil {
 				return nil, err
@@ -839,7 +867,7 @@ var ModerationCommands = []*commands.YAGCommand{
 			if parsed.TraditionalTriggerData != nil {
 				msg = parsed.TraditionalTriggerData.Message
 			}
-			err = WarnUser(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, target, parsed.Args[1].Str())
+			err = WarnUser(config, parsed.GuildData.GS.ID, parsed.GuildData.CS, msg, parsed.Author, target, parsed.Args[1].Str(), parsed.Context().Value(commands.CtxKeyExecutedByCommandTemplate) == true)
 			if err != nil {
 				return nil, err
 			}
@@ -1325,6 +1353,13 @@ func (*MessagesWithAttachmentsFilter) Matches(msg *dstate.MessageState) (delete 
 	return len(msg.Attachments) > 0
 }
 
+// Only delete messages sent by a bot.
+type BotMessagesFilter struct{}
+
+func (*BotMessagesFilter) Matches(msg *dstate.MessageState) (delete bool) {
+	return msg.Author.Bot
+}
+
 // Only delete messages satisfying ToID<=id<=FromID.
 type MessageIDFilter struct {
 	// 0 means no start ID set (and likewise for end ID.)
@@ -1385,7 +1420,7 @@ func PaginateWarnings(parsed *dcmd.Data) func(p *paginatedmessages.PaginatedMess
 		count, err := models.ModerationWarnings(
 			models.ModerationWarningWhere.UserID.EQ(userIDStr),
 			models.ModerationWarningWhere.GuildID.EQ(parsed.GuildData.GS.ID),
-		).CountG(context.Background())
+		).CountG(parsed.Context())
 		if err != nil {
 			return nil, err
 		}
@@ -1397,7 +1432,7 @@ func PaginateWarnings(parsed *dcmd.Data) func(p *paginatedmessages.PaginatedMess
 			qm.OrderBy("id desc"),
 			qm.Offset(skip),
 			qm.Limit(limit),
-		).AllG(context.Background())
+		).AllG(parsed.Context())
 		if err != nil {
 			return nil, err
 		}
