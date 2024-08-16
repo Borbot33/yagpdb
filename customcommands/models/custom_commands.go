@@ -42,7 +42,9 @@ type CustomCommand struct {
 	Roles                     types.Int64Array  `boil:"roles" json:"roles,omitempty" toml:"roles" yaml:"roles,omitempty"`
 	RolesWhitelistMode        bool              `boil:"roles_whitelist_mode" json:"roles_whitelist_mode" toml:"roles_whitelist_mode" yaml:"roles_whitelist_mode"`
 	ContextChannel            int64             `boil:"context_channel" json:"context_channel" toml:"context_channel" yaml:"context_channel"`
+	RedirectErrorsChannel     int64             `boil:"redirect_errors_channel" json:"redirect_errors_channel" toml:"redirect_errors_channel" yaml:"redirect_errors_channel"`
 	ReactionTriggerMode       int16             `boil:"reaction_trigger_mode" json:"reaction_trigger_mode" toml:"reaction_trigger_mode" yaml:"reaction_trigger_mode"`
+	ContextMenuType           int16             `boil:"context_menu_type" json:"context_menu_type" toml:"context_menu_type" yaml:"context_menu_type"`
 	LastError                 string            `boil:"last_error" json:"last_error" toml:"last_error" yaml:"last_error"`
 	LastErrorTime             null.Time         `boil:"last_error_time" json:"last_error_time,omitempty" toml:"last_error_time" yaml:"last_error_time,omitempty"`
 	RunCount                  int               `boil:"run_count" json:"run_count" toml:"run_count" yaml:"run_count"`
@@ -50,10 +52,9 @@ type CustomCommand struct {
 	Disabled                  bool              `boil:"disabled" json:"disabled" toml:"disabled" yaml:"disabled"`
 	TriggerOnEdit             bool              `boil:"trigger_on_edit" json:"trigger_on_edit" toml:"trigger_on_edit" yaml:"trigger_on_edit"`
 	PublicID                  string            `boil:"public_id" json:"public_id" toml:"public_id" yaml:"public_id"`
-	ImportCount               int               `boil:"import_count" json:"import_count" toml:"import_count" yaml:"import_count"`
 	Name                      null.String       `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
 	Public                    bool              `boil:"public" json:"public" toml:"public" yaml:"public"`
-	RedirectErrorsChannel     int64             `boil:"redirect_errors_channel" json:"redirect_errors_channel" toml:"redirect_errors_channel" yaml:"redirect_errors_channel"`
+	ImportCount               int               `boil:"import_count" json:"import_count" toml:"import_count" yaml:"import_count"`
 
 	R *customCommandR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L customCommandL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -77,7 +78,9 @@ var CustomCommandColumns = struct {
 	Roles                     string
 	RolesWhitelistMode        string
 	ContextChannel            string
+	RedirectErrorsChannel     string
 	ReactionTriggerMode       string
+	ContextMenuType           string
 	LastError                 string
 	LastErrorTime             string
 	RunCount                  string
@@ -85,10 +88,9 @@ var CustomCommandColumns = struct {
 	Disabled                  string
 	TriggerOnEdit             string
 	PublicID                  string
-	ImportCount               string
 	Name                      string
 	Public                    string
-	RedirectErrorsChannel     string
+	ImportCount               string
 }{
 	LocalID:                   "local_id",
 	GuildID:                   "guild_id",
@@ -107,7 +109,9 @@ var CustomCommandColumns = struct {
 	Roles:                     "roles",
 	RolesWhitelistMode:        "roles_whitelist_mode",
 	ContextChannel:            "context_channel",
+	RedirectErrorsChannel:     "redirect_errors_channel",
 	ReactionTriggerMode:       "reaction_trigger_mode",
+	ContextMenuType:           "context_menu_type",
 	LastError:                 "last_error",
 	LastErrorTime:             "last_error_time",
 	RunCount:                  "run_count",
@@ -115,10 +119,9 @@ var CustomCommandColumns = struct {
 	Disabled:                  "disabled",
 	TriggerOnEdit:             "trigger_on_edit",
 	PublicID:                  "public_id",
-	ImportCount:               "import_count",
 	Name:                      "name",
 	Public:                    "public",
-	RedirectErrorsChannel:     "redirect_errors_channel",
+	ImportCount:               "import_count",
 }
 
 var CustomCommandTableColumns = struct {
@@ -139,7 +142,9 @@ var CustomCommandTableColumns = struct {
 	Roles                     string
 	RolesWhitelistMode        string
 	ContextChannel            string
+	RedirectErrorsChannel     string
 	ReactionTriggerMode       string
+	ContextMenuType           string
 	LastError                 string
 	LastErrorTime             string
 	RunCount                  string
@@ -147,10 +152,9 @@ var CustomCommandTableColumns = struct {
 	Disabled                  string
 	TriggerOnEdit             string
 	PublicID                  string
-	ImportCount               string
 	Name                      string
 	Public                    string
-	RedirectErrorsChannel     string
+	ImportCount               string
 }{
 	LocalID:                   "custom_commands.local_id",
 	GuildID:                   "custom_commands.guild_id",
@@ -169,7 +173,9 @@ var CustomCommandTableColumns = struct {
 	Roles:                     "custom_commands.roles",
 	RolesWhitelistMode:        "custom_commands.roles_whitelist_mode",
 	ContextChannel:            "custom_commands.context_channel",
+	RedirectErrorsChannel:     "custom_commands.redirect_errors_channel",
 	ReactionTriggerMode:       "custom_commands.reaction_trigger_mode",
+	ContextMenuType:           "custom_commands.context_menu_type",
 	LastError:                 "custom_commands.last_error",
 	LastErrorTime:             "custom_commands.last_error_time",
 	RunCount:                  "custom_commands.run_count",
@@ -177,10 +183,9 @@ var CustomCommandTableColumns = struct {
 	Disabled:                  "custom_commands.disabled",
 	TriggerOnEdit:             "custom_commands.trigger_on_edit",
 	PublicID:                  "custom_commands.public_id",
-	ImportCount:               "custom_commands.import_count",
 	Name:                      "custom_commands.name",
 	Public:                    "custom_commands.public",
-	RedirectErrorsChannel:     "custom_commands.redirect_errors_channel",
+	ImportCount:               "custom_commands.import_count",
 }
 
 // Generated where
@@ -382,7 +387,9 @@ var CustomCommandWhere = struct {
 	Roles                     whereHelpertypes_Int64Array
 	RolesWhitelistMode        whereHelperbool
 	ContextChannel            whereHelperint64
+	RedirectErrorsChannel     whereHelperint64
 	ReactionTriggerMode       whereHelperint16
+	ContextMenuType           whereHelperint16
 	LastError                 whereHelperstring
 	LastErrorTime             whereHelpernull_Time
 	RunCount                  whereHelperint
@@ -390,10 +397,9 @@ var CustomCommandWhere = struct {
 	Disabled                  whereHelperbool
 	TriggerOnEdit             whereHelperbool
 	PublicID                  whereHelperstring
-	ImportCount               whereHelperint
 	Name                      whereHelpernull_String
 	Public                    whereHelperbool
-	RedirectErrorsChannel     whereHelperint64
+	ImportCount               whereHelperint
 }{
 	LocalID:                   whereHelperint64{field: "\"custom_commands\".\"local_id\""},
 	GuildID:                   whereHelperint64{field: "\"custom_commands\".\"guild_id\""},
@@ -412,7 +418,9 @@ var CustomCommandWhere = struct {
 	Roles:                     whereHelpertypes_Int64Array{field: "\"custom_commands\".\"roles\""},
 	RolesWhitelistMode:        whereHelperbool{field: "\"custom_commands\".\"roles_whitelist_mode\""},
 	ContextChannel:            whereHelperint64{field: "\"custom_commands\".\"context_channel\""},
+	RedirectErrorsChannel:     whereHelperint64{field: "\"custom_commands\".\"redirect_errors_channel\""},
 	ReactionTriggerMode:       whereHelperint16{field: "\"custom_commands\".\"reaction_trigger_mode\""},
+	ContextMenuType:           whereHelperint16{field: "\"custom_commands\".\"context_menu_type\""},
 	LastError:                 whereHelperstring{field: "\"custom_commands\".\"last_error\""},
 	LastErrorTime:             whereHelpernull_Time{field: "\"custom_commands\".\"last_error_time\""},
 	RunCount:                  whereHelperint{field: "\"custom_commands\".\"run_count\""},
@@ -420,10 +428,9 @@ var CustomCommandWhere = struct {
 	Disabled:                  whereHelperbool{field: "\"custom_commands\".\"disabled\""},
 	TriggerOnEdit:             whereHelperbool{field: "\"custom_commands\".\"trigger_on_edit\""},
 	PublicID:                  whereHelperstring{field: "\"custom_commands\".\"public_id\""},
-	ImportCount:               whereHelperint{field: "\"custom_commands\".\"import_count\""},
 	Name:                      whereHelpernull_String{field: "\"custom_commands\".\"name\""},
 	Public:                    whereHelperbool{field: "\"custom_commands\".\"public\""},
-	RedirectErrorsChannel:     whereHelperint64{field: "\"custom_commands\".\"redirect_errors_channel\""},
+	ImportCount:               whereHelperint{field: "\"custom_commands\".\"import_count\""},
 }
 
 // CustomCommandRels is where relationship names are stored.
@@ -454,9 +461,9 @@ func (r *customCommandR) GetGroup() *CustomCommandGroup {
 type customCommandL struct{}
 
 var (
-	customCommandAllColumns            = []string{"local_id", "guild_id", "group_id", "trigger_type", "text_trigger", "text_trigger_case_sensitive", "time_trigger_interval", "time_trigger_excluding_days", "time_trigger_excluding_hours", "last_run", "next_run", "responses", "channels", "channels_whitelist_mode", "roles", "roles_whitelist_mode", "context_channel", "reaction_trigger_mode", "last_error", "last_error_time", "run_count", "show_errors", "disabled", "trigger_on_edit", "public_id", "import_count", "name", "public", "redirect_errors_channel"}
+	customCommandAllColumns            = []string{"local_id", "guild_id", "group_id", "trigger_type", "text_trigger", "text_trigger_case_sensitive", "time_trigger_interval", "time_trigger_excluding_days", "time_trigger_excluding_hours", "last_run", "next_run", "responses", "channels", "channels_whitelist_mode", "roles", "roles_whitelist_mode", "context_channel", "redirect_errors_channel", "reaction_trigger_mode", "context_menu_type", "last_error", "last_error_time", "run_count", "show_errors", "disabled", "trigger_on_edit", "public_id", "name", "public", "import_count"}
 	customCommandColumnsWithoutDefault = []string{"local_id", "guild_id", "trigger_type", "text_trigger", "text_trigger_case_sensitive", "time_trigger_interval", "time_trigger_excluding_days", "time_trigger_excluding_hours", "responses", "channels_whitelist_mode", "roles_whitelist_mode"}
-	customCommandColumnsWithDefault    = []string{"group_id", "last_run", "next_run", "channels", "roles", "context_channel", "reaction_trigger_mode", "last_error", "last_error_time", "run_count", "show_errors", "disabled", "trigger_on_edit", "public_id", "import_count", "name", "public", "redirect_errors_channel"}
+	customCommandColumnsWithDefault    = []string{"group_id", "last_run", "next_run", "channels", "roles", "context_channel", "redirect_errors_channel", "reaction_trigger_mode", "context_menu_type", "last_error", "last_error_time", "run_count", "show_errors", "disabled", "trigger_on_edit", "public_id", "name", "public", "import_count"}
 	customCommandPrimaryKeyColumns     = []string{"guild_id", "local_id"}
 	customCommandGeneratedColumns      = []string{}
 )

@@ -65,15 +65,16 @@ const (
 
 	CommandTriggerNone CommandTriggerType = 10
 
-	CommandTriggerCommand    CommandTriggerType = 0
-	CommandTriggerStartsWith CommandTriggerType = 1
-	CommandTriggerContains   CommandTriggerType = 2
-	CommandTriggerRegex      CommandTriggerType = 3
-	CommandTriggerExact      CommandTriggerType = 4
-	CommandTriggerInterval   CommandTriggerType = 5
-	CommandTriggerReaction   CommandTriggerType = 6
-	CommandTriggerComponent  CommandTriggerType = 7
-	CommandTriggerModal      CommandTriggerType = 8
+	CommandTriggerCommand       CommandTriggerType = 0
+	CommandTriggerStartsWith    CommandTriggerType = 1
+	CommandTriggerContains      CommandTriggerType = 2
+	CommandTriggerRegex         CommandTriggerType = 3
+	CommandTriggerExact         CommandTriggerType = 4
+	CommandTriggerInterval      CommandTriggerType = 5
+	CommandTriggerReaction      CommandTriggerType = 6
+	CommandTriggerComponent     CommandTriggerType = 7
+	CommandTriggerModal         CommandTriggerType = 8
+	CommandTriggerContextMenu   CommandTriggerType = 9
 )
 
 var (
@@ -88,19 +89,21 @@ var (
 		CommandTriggerNone,
 		CommandTriggerComponent,
 		CommandTriggerModal,
+		CommandTriggerContextMenu,
 	}
 
 	triggerStrings = map[CommandTriggerType]string{
-		CommandTriggerCommand:    "Command",
-		CommandTriggerStartsWith: "StartsWith",
-		CommandTriggerContains:   "Contains",
-		CommandTriggerRegex:      "Regex",
-		CommandTriggerExact:      "Exact",
-		CommandTriggerInterval:   "Interval",
-		CommandTriggerReaction:   "Reaction",
-		CommandTriggerNone:       "None",
-		CommandTriggerComponent:  "Component",
-		CommandTriggerModal:      "Modal",
+		CommandTriggerCommand:       "Command",
+		CommandTriggerStartsWith:    "StartsWith",
+		CommandTriggerContains:      "Contains",
+		CommandTriggerRegex:         "Regex",
+		CommandTriggerExact:         "Exact",
+		CommandTriggerInterval:      "Interval",
+		CommandTriggerReaction:      "Reaction",
+		CommandTriggerNone:          "None",
+		CommandTriggerComponent:     "Component",
+		CommandTriggerModal:         "Modal",
+		CommandTriggerContextMenu:   "Context Menu",
 	}
 )
 
@@ -108,6 +111,11 @@ const (
 	ReactionModeBoth       = 0
 	ReactionModeAddOnly    = 1
 	ReactionModeRemoveOnly = 2
+)
+
+const (
+	UserContextMenu      = 0
+	MessageContextMenu   = 1
 )
 
 func (t CommandTriggerType) String() string {
@@ -134,6 +142,7 @@ type CustomCommand struct {
 	TimeTriggerExcludingHours []int64 `schema:"time_trigger_excluding_hours"`
 
 	ReactionTriggerMode int `schema:"reaction_trigger_mode"`
+	ContextMenuType 	int `schema:"context_menu_type"`
 
 	// If set, then the following channels are required, otherwise they are ignored
 	RequireChannels bool    `json:"require_channels" schema:"require_channels"`
@@ -225,6 +234,7 @@ func (cc *CustomCommand) ToDBModel() *models.CustomCommand {
 		RedirectErrorsChannel:     cc.RedirectErrorsChannel,
 
 		ReactionTriggerMode: int16(cc.ReactionTriggerMode),
+		ContextMenuType:     int16(cc.ContextMenuType),
 
 		Responses: cc.Responses,
 

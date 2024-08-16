@@ -102,6 +102,8 @@
                                                     Message Component</option>
                                                 <option value="modal" {{if eq .CC.TriggerType 8}} selected{{end}}>
                                                     Modal Submission</option>
+                                                <option value="context_menu" {{if eq .CC.TriggerType 9}} selected{{end}}>
+                                                    Context Menu</option>
                                             </select>
                                         </div>
                                     </div>
@@ -145,6 +147,9 @@
                                         <p id="trigger-desc-modal">
                                             The command will run when a modal whose custom ID matches the given regex is submitted. BETA FEATURE.
                                         </p>
+                                        <p id="trigger-desc-context_menu">
+                                            The command will run when someone runs a context menu. BETA FEATURE.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -154,6 +159,8 @@
                                         <div class="form-group">
                                             <label id="cc-message-trigger-label">Trigger (<span id="trigger-length">{{len .CC.TextTrigger}}</span>/1000)</label>
                                             <label id="cc-customid-trigger-label">Component Custom ID Regex (<span id="trigger-length">{{len .CC.TextTrigger}}</span>/1000)</label>
+                                            <label id="cc-context_menu_name-label">Context menu name (<span id="trigger-length">{{len .CC.TextTrigger}}</span>/20)</label>
+
                                             <div class="input-group mb-2">
                                                 <div class="input-group-prepend" id="command-trigger-prepended-prefix">
                                                     <div class="input-group-text">{{.CommandPrefix}}</div>
@@ -162,16 +169,41 @@
                                                     value="{{.CC.TextTrigger}}">
                                             </div>
                                             <div class="row">
-                                              <div class="col-lg-6"> {{checkbox "case_sensitive" "case_sensitive" "Case Sensitive?" .CC.TextTriggerCaseSensitive}}</div>
-                                              <div class="col-lg-6">
-                                                <div id="cc-message-trigger-details">
-                                                    {{$disabledClass := ""}}
-                                                    {{if not .IsGuildPremium}}{{$disabledClass = "disabled"}}{{end}}
-                                                    {{checkbox "trigger_on_edit" "trigger_on_edit" "Trigger on message edits too? (Premium Only!)" .CC.TriggerOnEdit $disabledClass}}
+                                                <div class="col-lg-6">
+                                                    <div id="cc-message-case-sensitive">
+                                                        {{checkbox "case_sensitive" "case_sensitive" "Case Sensitive?" .CC.TextTriggerCaseSensitive}}
+                                                    </div>
                                                 </div>
-                                              </div>
+                                                <div class="col-lg-6">
+                                                    <div id="cc-message-trigger-details">
+                                                        {{$disabledClass := ""}}
+                                                        {{if not .IsGuildPremium}}{{$disabledClass = "disabled"}}{{end}}
+                                                        {{checkbox "trigger_on_edit" "trigger_on_edit" "Trigger on message edits too? (Premium Only!)" .CC.TriggerOnEdit $disabledClass}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div id="cc-context_menu-options">
+                                                        <label>Context Menu type</label>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="context_menu_type"
+                                                                id="user_context_menu-{{.CC.LocalID}}" value="0"
+                                                                {{if eq .CC.ContextMenuType 0}}checked{{end}}>
+                                                            <label class="form-check-label" for="user_context_menu-{{.CC.LocalID}}">
+                                                                User
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="context_menu_type"
+                                                                id="message_context_menu-{{.CC.LocalID}}" value="1"
+                                                                {{if eq .CC.ContextMenuType 1}}checked{{end}}>
+                                                            <label class="form-check-label" for="message_context_menu-{{.CC.LocalID}}">
+                                                                Message
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                          </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -569,12 +601,14 @@
     });
 
     var intervalTriggerEls = ['#interval-cc-run-now', '#cc-time-trigger-details'];
-    var textTriggerEls = ['#cc-text-trigger-details', '#cc-extra-settings'];
+    var textTriggerEls = ['#cc-text-trigger-details', '#cc-extra-settings', '#cc-message-case-sensitive'];
+    var contextMenuTriggerEls = ['#cc-text-trigger-details', '#cc-extra-settings'];
     var messageTriggerEls = [...textTriggerEls, '#cc-message-trigger-label', '#cc-message-trigger-details'];
-    var interactionTriggerEls = [...textTriggerEls, '#cc-customid-trigger-label'];
+    var interactionTriggerEls = [...textTriggerEls, '#cc-customid-trigger-label', '#cc-message-case-sensitive'];
 
     // html elements that should be shown for specific trigger types and hidden otherwise
     var triggerTypeEls = {
+        context_menu: [...contextMenuTriggerEls, '#cc-context_menu_name-label', '#cc-context_menu-options'],
         modal: [...interactionTriggerEls, '#trigger-desc-modal'],
         component: [...interactionTriggerEls, '#trigger-desc-component'],
         interval_hours: [...intervalTriggerEls, '#trigger-desc-interval_hours'],
@@ -641,7 +675,7 @@
 
     // 'require roles' mode with no required roles
     var checkNoEmptyRequiredRoles = {
-        applicableTriggerTypes: ['modal', 'component', 'reaction', 'cmd', 'prefix', 'contains', 'regex', 'exact'],
+        applicableTriggerTypes: ['modal', 'component', 'reaction', 'cmd', 'prefix', 'contains', 'regex', 'exact', 'context_menu'],
         warningId: 'require-no-roles-warning',
         run() {
             const isRequireMode = $('#require-role-mode').prop('checked');

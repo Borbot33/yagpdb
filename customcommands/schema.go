@@ -53,6 +53,8 @@ ALTER TABLE custom_commands ADD COLUMN IF NOT EXISTS redirect_errors_channel BIG
 `, `
 ALTER TABLE custom_commands ADD COLUMN IF NOT EXISTS reaction_trigger_mode SMALLINT NOT NULL DEFAULT 0;
 `, `
+ALTER TABLE custom_commands ADD COLUMN IF NOT EXISTS context_menu_type SMALLINT NOT NULL DEFAULT 0;
+`, `
 ALTER TABLE custom_commands ADD COLUMN IF NOT EXISTS last_error TEXT NOT NULL DEFAULT '';
 `, `
 ALTER TABLE custom_commands ADD COLUMN IF NOT EXISTS last_error_time TIMESTAMP WITH TIME ZONE;

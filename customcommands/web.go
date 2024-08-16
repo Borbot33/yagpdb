@@ -803,6 +803,8 @@ func triggerTypeFromForm(str string) CommandTriggerType {
 		return CommandTriggerComponent
 	case "modal":
 		return CommandTriggerModal
+	case "context_menu":
+		return CommandTriggerContextMenu
 	default:
 		return CommandTriggerCommand
 
